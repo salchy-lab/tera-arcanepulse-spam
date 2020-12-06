@@ -10,7 +10,7 @@
         "guiName": "<font color='#FDD017'>Salchy's mod</font>",
         "reloadable": false
 	},
-    "servers": ["https://raw.githubusercontent.com/salchy-lab/sorc-arcanepulse-spam/"],
+    "servers": ["https://raw.githubusercontent.com/salchy-lab/tera-arcanepulse-spam/"],
     "supportUrl": "",
     "version": "<font color='#00FFFF'>1.0.0</font>"
 }
