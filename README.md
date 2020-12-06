@@ -1,6 +1,8 @@
 # tera-arcanepulse-spam
 Arcane pulse mod finally public and free.
 
+////06.12.2020: Added auto mana boost\\\\
+
 Features:
 -Hit only PvE targets
 -Hit only PvP targets
