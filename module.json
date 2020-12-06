@@ -6,11 +6,11 @@
     "donationUrl": "",
     "name": "salchy",
     "options": {
-        "niceName": "<font color='#FDD017'>Salchy</font>",
-        "guiName": "<font color='#FDD017'>Salchy's mod</font>",
+        "niceName": "<font color='#FDD017'>Salchy Arcane Pulse Spam</font>",
+        "guiName": "<font color='#FDD017'>Salchy's Arcane Pulse Spam mod</font>",
         "reloadable": false
 	},
-    "servers": ["https://raw.githubusercontent.com/salchy-lab/tera-arcanepulse-spam/"],
+    "servers": [""],
     "supportUrl": "",
     "version": "<font color='#00FFFF'>1.0.0</font>"
 }
