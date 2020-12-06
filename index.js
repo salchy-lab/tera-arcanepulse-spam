@@ -10,7 +10,7 @@ module.exports = function salchy(script) {
 	let myPosition = null;
 	let myAngle = null;
 	let monsters = [];
-	let aux = [];
+	let bosses = [];
 	let arcaneSpamInt = null;
 	var arcaneSpam_delay = 30;
 	let arcane_packet = {};
@@ -45,7 +45,7 @@ module.exports = function salchy(script) {
 	})
 	script.hook('S_LOAD_TOPO', 3, packet => {
 		monsters = [];
-		aux = [];
+		bosses = [];
 		bossfocused = false;
 	});	
 	script.hook('C_START_INSTANCE_SKILL', 7, (packet) => {
@@ -90,21 +90,18 @@ module.exports = function salchy(script) {
 	})
 	script.hook('S_SPAWN_NPC', 11, packet => {
 		if(!sorc_enab) return;
-		if(focusboss && bossfocused) return;
 		monsters.push({ gameId: packet.gameId, loc: packet.loc });
 	})
 	script.hook('S_BOSS_GAGE_INFO', 3, packet => {
 		if(!sorc_enab) return;
 		if(!focusboss) return;
-		if(bossfocused) return;
-		aux = [];
+		let boss = bosses.find(m => m.gameId === packet.id);
+		if(boss) return;
 		let monster = monsters.find(m => m.gameId === packet.id);
 		if (monster) {
-			aux.push({ gameId: monster.gameId, loc: monster.loc });
-			monsters = aux;
-			bossfocused = true;
+			bosses.push({ gameId: monster.gameId, loc: monster.loc });
 				script.send("S_CUSTOM_STYLE_SYSTEM_MESSAGE", 1, {
-					message: "Boss focused",
+					message: "Boss detected",
 					style: 54
 				});
 				script.send("S_PLAY_SOUND", 1, {
@@ -116,22 +113,18 @@ module.exports = function salchy(script) {
 		if(!sorc_enab) return;
 		let monster = monsters.find(m => m.gameId === packet.gameId);
 		if (monster) monster.loc = packet.loc;		
+		let boss = bosses.find(m => m.gameId === packet.gameId);
+		if (boss) boss.loc = packet.loc;			
 	})
 	script.hook('S_DESPAWN_NPC', 3, packet => {
 		if(!sorc_enab) return;
 		let monsterIndex = monsters.findIndex(gidSearchFunc(packet.gameId));
 		if (monsterIndex != -1) {
 			monsters.splice(monsterIndex, 1);
-			if(focusboss && bossfocused) { 
-				bossfocused = false; 
-				script.send("S_CUSTOM_STYLE_SYSTEM_MESSAGE", 1, {
-					message: "Boss despawned",
-					style: 54
-				});
-				script.send("S_PLAY_SOUND", 1, {
-					SoundID: 2023
-				});			
-			}
+		}
+		let bossIndex = bosses.findIndex(gidSearchFunc(packet.gameId));
+		if (bossIndex != -1) {
+			bosses.splice(bossIndex, 1); 		
 		}		
 	})
 	script.hook('S_ACTION_STAGE', 9, packet => {
@@ -146,11 +139,20 @@ module.exports = function salchy(script) {
 		if(!sorc_enab) return;
 		if(!enabled) return;
 		let targets = [];
-		for(let monster of monsters) {
-			targets.push({
-				gameId: monster.gameId,
-				unk: 0
-			});
+		if(focusboss) {
+			for(let boss of bosses) {
+				targets.push({
+					gameId: boss.gameId,
+					unk: 0
+				});
+			}		
+		} else {
+			for(let monster of monsters) {
+				targets.push({
+					gameId: monster.gameId,
+					unk: 0
+				});
+		}
 		}
 		script.toClient('S_START_USER_PROJECTILE', 9, packet)
 		script.send('C_HIT_USER_PROJECTILE', 4, {
