@@ -307,6 +307,7 @@ module.exports = function salchy(script) {
 	script.hook('S_START_USER_PROJECTILE', 9, packet => {
 		if(!sorc_enab) return;
 		if(!enabled) return;
+		if(packet.gameId != cid) return;
 		let targets = [];
 		if(pve) {
 			if(focusboss) {
