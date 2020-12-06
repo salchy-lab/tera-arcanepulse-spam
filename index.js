@@ -20,6 +20,7 @@ module.exports = function salchy(script) {
 	let bugme = false;
 	let etarg;
 	let focusboss = true;
+	let bossfocused = false;
 	const gidSearchFunc = function(gid) {
 		return ((element) => element.gameId === gid);
 	};	
@@ -45,6 +46,7 @@ module.exports = function salchy(script) {
 	script.hook('S_LOAD_TOPO', 3, packet => {
 		monsters = [];
 		bosses = [];
+		bossfocused = false;
 	});	
 	script.hook('C_START_INSTANCE_SKILL', 7, (packet) => {
 	if(!sorc_enab) return;	
@@ -127,11 +129,28 @@ module.exports = function salchy(script) {
 	})
 	script.hook('S_ACTION_STAGE', 9, packet => {
 		if(!sorc_enab) return;
+		let monster = monsters.find(m => m.gameId === packet.gameId);
+		if (monster) monster.loc = packet.loc;		
+		let boss = bosses.find(m => m.gameId === packet.gameId);
+		if (boss) boss.loc = packet.loc;		
 		if(packet.gameId == cid && enabled && packet.skill.id == arcane_id && sorc_enab) return false;
+		if(packet.gameId == cid && enabled && sorc_enab && bugme) {
+			packet.loc.z = zbug - zval;
+			return true;
+		}
+		
 	})
 	script.hook('S_ACTION_END', 5, packet => {
 		if(!sorc_enab) return;
+		let monster = monsters.find(m => m.gameId === packet.gameId);
+		if (monster) monster.loc = packet.loc;		
+		let boss = bosses.find(m => m.gameId === packet.gameId);
+		if (boss) boss.loc = packet.loc;		
 		if(packet.gameId == cid && enabled && packet.skill.id == arcane_id && sorc_enab) return false;
+		if(packet.gameId == cid && enabled && sorc_enab && bugme) {
+			packet.loc.z = zbug - zval;
+			return true;
+		}		
 	})	
 	script.hook('S_START_USER_PROJECTILE', 9, packet => {
 		if(!sorc_enab) return;
