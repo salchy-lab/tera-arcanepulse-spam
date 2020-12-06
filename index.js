@@ -24,6 +24,7 @@ module.exports = function salchy(script) {
 	let party = [];
 	let mana_boost_cd = false;
 	let CD_mana;
+	let cancelanim = false;
 
 	let arcaneSpam_delay = config[0].arcaneSpam_delay;
 	let focusguild = config[0].focusguild;
@@ -143,20 +144,24 @@ module.exports = function salchy(script) {
 	script.hook('C_START_INSTANCE_SKILL', 7, (packet) => {
 	if(!sorc_enab) return;	
 	clearInterval(arcaneSpamInt);
-			arcaneSpamInt = null;			
+			arcaneSpamInt = null;
+	cancelanim = false;
 		
 		if((packet.skill.id === 11200) && enabled && sorc_enab) {
 		endp = packet.endpoints;
 		etarg = packet.targets;
+		cancelanim = true;
 					{
 						if(arcaneSpamInt != null) 
 						{
 							clearInterval(arcaneSpamInt);
 								arcaneSpamInt = null;
+								
 						}else 
 						{
 							arcaneSpamInt = setInterval(arcaneSpam, arcaneSpam_delay);
 							arcaneSpam();
+							
 						}
 					}
 			return false;
@@ -167,6 +172,7 @@ module.exports = function salchy(script) {
 			if(!enabled) return;
 			clearInterval(arcaneSpamInt);
 					arcaneSpamInt = null;
+			cancelanim = false;		
 			if(bugme) {
 				packet.loc.z = zbug;
 				return true;
@@ -264,7 +270,7 @@ module.exports = function salchy(script) {
 		if (boss) boss.loc = packet.loc;		
 		let jugador = people.find(m => m.gameId === packet.gameId);
 		if (jugador) jugador.loc = packet.loc;		
-		if(packet.gameId == cid && enabled && packet.skill.id == arcane_id && sorc_enab) return false;
+		if(packet.gameId == cid && enabled && packet.skill.id == arcane_id && sorc_enab && cancelanim) return false;
 		if(packet.gameId == cid && enabled && sorc_enab && bugme) {
 			packet.loc.z = zbug - zval;
 			return true;
@@ -279,7 +285,7 @@ module.exports = function salchy(script) {
 		if (boss) boss.loc = packet.loc;
 		let jugador = people.find(m => m.gameId === packet.gameId);
 		if (jugador) jugador.loc = packet.loc;			
-		if(packet.gameId == cid && enabled && packet.skill.id == arcane_id && sorc_enab) return false;
+		if(packet.gameId == cid && enabled && packet.skill.id == arcane_id && sorc_enab && cancelanim) return false;
 		if(packet.gameId == cid && enabled && sorc_enab && bugme) {
 			packet.loc.z = zbug - zval;
 			return true;
