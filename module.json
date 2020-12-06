@@ -1,7 +1,7 @@
 {
     "author": "<font color='#00FFFF'>Salchy</font>",
     "description": "Sorc Arcane Pulse Spam Mod",
-    "disableAutoUpdate": false,
+    "disableAutoUpdate": true,
     "disabled": false,
     "donationUrl": "",
     "name": "salchy",
