@@ -20,7 +20,6 @@ module.exports = function salchy(script) {
 	let bugme = false;
 	let etarg;
 	let focusboss = true;
-	let bossfocused = false;
 	const gidSearchFunc = function(gid) {
 		return ((element) => element.gameId === gid);
 	};	
@@ -46,7 +45,6 @@ module.exports = function salchy(script) {
 	script.hook('S_LOAD_TOPO', 3, packet => {
 		monsters = [];
 		bosses = [];
-		bossfocused = false;
 	});	
 	script.hook('C_START_INSTANCE_SKILL', 7, (packet) => {
 	if(!sorc_enab) return;	
