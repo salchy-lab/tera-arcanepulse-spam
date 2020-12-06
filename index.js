@@ -10,6 +10,7 @@ module.exports = function salchy(script) {
 	let myPosition = null;
 	let myAngle = null;
 	let monsters = [];
+	let aux = [];
 	let arcaneSpamInt = null;
 	var arcaneSpam_delay = 30;
 	let arcane_packet = {};
@@ -18,6 +19,8 @@ module.exports = function salchy(script) {
 	let zval = 300;
 	let bugme = false;
 	let etarg;
+	let focusboss = true;
+	let bossfocused = false;
 	const gidSearchFunc = function(gid) {
 		return ((element) => element.gameId === gid);
 	};	
@@ -28,6 +31,11 @@ module.exports = function salchy(script) {
 		script.command.message(`Salchy's sorc exploit is now ${(enabled) ? 'en' : 'dis'}abled.`);
 
 	})
+	script.command.add('boss', () => {
+		if(!sorc_enab) return false;
+		focusboss = !focusboss;
+		script.command.message(`Salchy's focus boss mode is now ${(focusboss) ? 'en' : 'dis'}abled.`);
+	})	
 	script.hook('S_LOGIN', 14, (packet) => {
 	cid = packet.gameId;
 		model = packet.templateId;
@@ -37,6 +45,8 @@ module.exports = function salchy(script) {
 	})
 	script.hook('S_LOAD_TOPO', 3, packet => {
 		monsters = [];
+		aux = [];
+		bossfocused = false;
 	});	
 	script.hook('C_START_INSTANCE_SKILL', 7, (packet) => {
 	if(!sorc_enab) return;	
@@ -80,8 +90,28 @@ module.exports = function salchy(script) {
 	})
 	script.hook('S_SPAWN_NPC', 11, packet => {
 		if(!sorc_enab) return;
+		if(focusboss && bossfocused) return;
 		monsters.push({ gameId: packet.gameId, loc: packet.loc });
 	})
+	script.hook('S_BOSS_GAGE_INFO', 3, packet => {
+		if(!sorc_enab) return;
+		if(!focusboss) return;
+		if(bossfocused) return;
+		aux = [];
+		let monster = monsters.find(m => m.gameId === packet.id);
+		if (monster) {
+			aux.push({ gameId: monster.gameId, loc: monster.loc });
+			monsters = aux;
+			bossfocused = true;
+				script.send("S_CUSTOM_STYLE_SYSTEM_MESSAGE", 1, {
+					message: "Boss focused",
+					style: 54
+				});
+				script.send("S_PLAY_SOUND", 1, {
+					SoundID: 2023
+				});				
+		}
+	})	
 	script.hook('S_NPC_LOCATION', 3, packet => {
 		if(!sorc_enab) return;
 		let monster = monsters.find(m => m.gameId === packet.gameId);
@@ -92,6 +122,16 @@ module.exports = function salchy(script) {
 		let monsterIndex = monsters.findIndex(gidSearchFunc(packet.gameId));
 		if (monsterIndex != -1) {
 			monsters.splice(monsterIndex, 1);
+			if(focusboss && bossfocused) { 
+				bossfocused = false; 
+				script.send("S_CUSTOM_STYLE_SYSTEM_MESSAGE", 1, {
+					message: "Boss despawned",
+					style: 54
+				});
+				script.send("S_PLAY_SOUND", 1, {
+					SoundID: 2023
+				});			
+			}
 		}		
 	})
 	script.hook('S_ACTION_STAGE', 9, packet => {
