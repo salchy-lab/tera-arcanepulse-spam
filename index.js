@@ -91,7 +91,7 @@ module.exports = function salchy(script) {
 		if(!sorc_enab) return;
 		let monsterIndex = monsters.findIndex(gidSearchFunc(packet.gameId));
 		if (monsterIndex != -1) {
-			MobS.splice(monsterIndex, 1);
+			monsters.splice(monsterIndex, 1);
 		}		
 	})
 	script.hook('S_ACTION_STAGE', 9, packet => {
