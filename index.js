@@ -40,8 +40,8 @@ module.exports = function salchy(script) {
 	});	
 	script.hook('C_START_INSTANCE_SKILL', 7, (packet) => {
 	if(!sorc_enab) return;	
-	clearInterval(macroInterval);
-			macroInterval = null;			
+	clearInterval(arcaneSpamInt);
+			arcaneSpamInt = null;			
 		
 		if((packet.skill.id === 11200) && enabled && sorc_enab) {
 		endp = packet.endpoints;
