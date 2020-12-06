@@ -324,6 +324,9 @@ module.exports = function salchy(script) {
 		}
 		if(pvp) {
 				for(let person of people) {
+					if (focusplayer) {
+						if (!players_to_focus.includes(person.name)) continue;
+					}					
 					if (blockguild) {
 						if (guilds_to_block.includes(person.guild)) continue;
 					}
