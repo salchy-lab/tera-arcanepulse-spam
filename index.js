@@ -15,12 +15,15 @@ module.exports = function salchy(script) {
 	let people = [];
 	let arcaneSpamInt = null;
 	let arcane_packet = {};
+	let mb_packet = {};
 	let endp;
 	let zbug;
 	let zval = 300;
 	let bugme = false;
 	let etarg;
 	let party = [];
+	let mana_boost_cd = false;
+	let CD_mana;
 
 	let arcaneSpam_delay = config[0].arcaneSpam_delay;
 	let focusguild = config[0].focusguild;
@@ -426,28 +429,61 @@ module.exports = function salchy(script) {
 			script.command.message('Invincible mode : ' + bugme);
 			return false;
 		}
-	})	
+	})
+	
+	script.hook('S_START_COOLTIME_SKILL', 3, packet => {
+		if (packet.skill.id == 340200 && sorc_enab && !mana_boost_cd) {
+			mana_boost_cd = true;
+			CD_mana = packet.cooldown;
+			setTimeout(function () {
+				mana_boost_cd = false;
+			}, CD_mana);
+		}
+	})
+		
     function arcaneSpam() {									
-		arcane_packet = {
-			
-					skill: {
-						reserved: 0,
-						npc: false,
-						type: 1,
-						huntingZoneId: 0,
-						id: arcane_id
-					},
-					loc: {
-							x: myPosition.x,
-							y: myPosition.y,
-							z: bugme ? zbug : myPosition.z
-						},
-					w: myAngle,
-					continue: false,
-					targets: etarg,
-					endpoints: endp
-							}												
-        script.toServer('C_START_INSTANCE_SKILL', 7, arcane_packet);
+		arcane_packet = {	
+			skill: {
+				reserved: 0,
+				npc: false,
+				type: 1,
+				huntingZoneId: 0,
+				id: arcane_id
+			},
+			loc: {
+					x: myPosition.x,
+					y: myPosition.y,
+					z: bugme ? zbug : myPosition.z
+				},
+			w: myAngle,
+			continue: false,
+			targets: etarg,
+			endpoints: endp
+		}
+		mb_packet = {
+			skill: {
+				reserved: 0,
+				npc: false,
+				type: 1,
+				huntingZoneId: 0,
+				id: 340200
+			},
+			loc: {
+				x: myPosition.x,
+				y: myPosition.y,
+				z: bugme ? zbug : myPosition.z
+			},
+			w: myAngle,
+			continue: false,
+			targets: [{
+				arrowId: 0,
+				gameId: 0,
+				hitCylinderId: 0
+			}],
+			endpoints: endp
+		}
+		if (mana_boost_cd) script.toServer('C_START_INSTANCE_SKILL', 7, arcane_packet);    
+		if (!mana_boost_cd) script.toServer('C_START_INSTANCE_SKILL', 7, mb_packet);
 	}
 	function reloadModule(mod_to_reload){
 		delete require.cache[require.resolve(mod_to_reload)]
