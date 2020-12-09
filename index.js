@@ -374,6 +374,18 @@ module.exports = function salchy(script) {
 					});					
 				}
 				for(let person of people) {
+					if (focusplayer) {
+						if (!players_to_focus.includes(person.name)) continue;
+					}					
+					if (blockguild) {
+						if (guilds_to_block.includes(person.guild)) continue;
+					}
+					if (focusguild) {
+						if (!guilds_to_focus.includes(person.guild)) continue;
+					}
+					if (ignore_impregnable) {
+						if (impregnable_weapon_ids.includes(person.weapon)) continue;
+					}					
 					targets.push({
 						gameId: person.gameId,
 						unk: 0
@@ -482,7 +494,7 @@ module.exports = function salchy(script) {
 	}
 	function reloadModule(mod_to_reload){
 		delete require.cache[require.resolve(mod_to_reload)]
-		console.log('reloadModule: Reloading ' + mod_to_reload + "...");
+		console.log('Arcane Pulse Spam : Reloading ' + mod_to_reload + "...");
 		return require(mod_to_reload)
 	}	
 }
