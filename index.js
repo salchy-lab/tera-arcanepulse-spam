@@ -39,9 +39,6 @@ module.exports = function salchy(script) {
 	let focusboss = config[0].focusboss;
 	let pvx = config[0].pvx;
 
-	const gidSearchFunc = function(gid) {
-		return ((element) => element.gameId === gid);
-	};
 	const impregnable_weapon_ids = [90401, 90402, 90403, 90404, 90405, 90406, 90407, 90408, 90409, 90410, 90411, 90412, 90413];	
 	
 	script.command.add('salchy', () => {
@@ -247,20 +244,11 @@ module.exports = function salchy(script) {
 	})
 	script.hook('S_DESPAWN_NPC', 3, packet => {
 		if(!sorc_enab) return;
-		let monsterIndex = monsters.findIndex(gidSearchFunc(packet.gameId));
-		if (monsterIndex != -1) {
-			monsters.splice(monsterIndex, 1);
-		}
-		let bossIndex = bosses.findIndex(gidSearchFunc(packet.gameId));
-		if (bossIndex != -1) {
-			bosses.splice(bossIndex, 1); 		
-		}		
+		monsters = monsters.filter(m => m.gameId != packet.gameId);
+		bosses = bosses.filter(m => m.gameId != packet.gameId);		
 	})
 	script.hook('S_DESPAWN_USER', 3, (packet) => {
-		let playerIndex = people.findIndex(gidSearchFunc(packet.gameId));
-		if (playerIndex != -1) {
-			people.splice(playerIndex, 1);
-		}
+		people = people.filter(m => m.gameId != packet.gameId);
 	})	
 	script.hook('S_ACTION_STAGE', 9, packet => {
 		if(!sorc_enab) return;
